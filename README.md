@@ -19,4 +19,9 @@ make clean
 make build
 ```
 
+Source the setup file
+```bash
+source install/setup.bash
+```
+
 
