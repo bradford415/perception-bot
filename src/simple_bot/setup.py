@@ -16,15 +16,15 @@ setup(
 
         # INSTALL CONFIG FILES
         (os.path.join('share', package_name, 'config'),
-        glob('simple_bot/config/*')),
+        glob('config/*')),
 
         # INSTALL DESCRIPTION FILES
         (os.path.join('share', package_name, 'description'),
-        glob('simple_bot/description/*')),    
-        
+        glob('description/*')),    
+
         # INSTALL LAUNCH FILES
         (os.path.join('share', package_name, 'launch'),
-            glob('simple_bot/launch/*.launch.py')),
+            glob('launch/*.launch.py')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -39,8 +39,8 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'read_lidar = test_bot_python.read_lidar:main',
-            'compute_icp = test_bot_python.compute_icp:main',
+            'read_lidar = simple_bot.read_lidar:main',
+            'compute_icp = simple_bot.compute_icp:main',
         ],
     },
 )
