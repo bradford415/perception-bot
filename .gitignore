@@ -1,6 +1,10 @@
-devel/
-logs/
+**/__pycache__/**
+
+log/
 build/
+install/
+
+devel/
 bin/
 lib/
 msg_gen/

@@ -1,0 +1,235 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="robot">
+    <!-- Constants -->
+    <xacro:include filename="$(find simple_bot)/description/const.xacro"/>
+    <xacro:include filename="$(find simple_bot)/description/materials.xacro"/>
+    <!--<xacro:include filename="$(find simple_bot)/description/ros2_control.xacro"/>-->
+    <xacro:include filename="$(find simple_bot)/description/gazebo_plugins.xacro"/>
+    <xacro:include filename="$(find simple_bot)/description/gazebo.xacro"/> <!-- Gazebo specific tags such as friction-->
+
+
+    <!-- TODO:
+    - Restructure link structure s.t. has chassis. Follow  https://www.youtube.com/watch?v=BcjHyhV0kIs
+    -->
+    <link name="base_link"/>
+    <joint name="base_2_chassis" type="fixed">
+        <origin xyz="${chassis_length/2} 0.0 0.0" rpy="0 0 0"/>
+        <parent link="base_link"/>
+        <child link="chassis_link"/>
+    </joint>
+
+    <link name="chassis_link">
+        <visual>
+            <geometry> 
+                <box size="${chassis_length} ${chassis_width} ${chassis_height}"/> 
+            </geometry>
+            <material name="white"/>
+        </visual>
+
+        <collision>
+            <geometry> 
+                <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
+            </geometry>
+        </collision>
+
+        <inertial>
+            <mass value="${chassis_mass}"/>
+            <inertia ixx="${1/12*chassis_mass*(chassis_width*chassis_width + chassis_height*chassis_height)}" 
+                        ixy="0.0" ixz="0.0" iyy="${1/12*chassis_mass*(chassis_length*chassis_length + chassis_height*chassis_height)}" 
+                        iyz="0.0" izz="${1/12*chassis_mass*(chassis_width*chassis_width + chassis_length*chassis_length)}"/>
+        </inertial>
+
+        <gazebo reference="chassis">
+            <material>Gazebo/White</material>
+        </gazebo>
+    </link>
+
+
+    <!-- Left Wheel -->
+    <joint name="chassis_link_2_lwheel" type="continuous">
+        <origin rpy = "${PI/2} 0 ${PI}" xyz="${-chassis_length/2} ${chassis_width/2 + wheel_thickness/2} 0"/>
+        <parent link="chassis_link"/>
+        <child link="lwheel"/>
+        <axis xyz="0 0 1"/>
+        <dynamics damping="0.1" friction="0.1"/>
+        <limits effort="100" velocity="10.0"/>
+    </joint>
+
+    <link name="lwheel">
+        <visual>
+            <geometry>
+                <cylinder length="${wheel_thickness}" radius="${wheel_radius}"/>
+            </geometry>
+            <material name="red"/>
+        </visual>
+
+        <collision>
+            <geometry>
+                <cylinder length="${wheel_thickness}" radius="${wheel_radius}"/>
+            </geometry>
+        </collision>
+
+        <inertial>
+            <mass value="${left_wheel_mass}"/>
+            <inertia ixx="${1/12*left_wheel_mass*(3*wheel_radius*wheel_radius + wheel_thickness*wheel_thickness)}" ixy="0" 
+                        ixz="0.0" iyy="${1/12*left_wheel_mass*(3*wheel_radius*wheel_radius + wheel_thickness*wheel_thickness)}" iyz="0.0" 
+                        izz="${1/2*left_wheel_mass*wheel_radius*wheel_radius}"/>
+        </inertial>
+
+        <gazebo reference="chassis">
+            <material>Gazebo/Red</material>
+        </gazebo>
+    </link>
+
+
+    <!-- Right Wheel -->
+     <!-- TODO: Ideally want yaw to be 0 so that in HW->SW more symmetricalfor wheel joints-->
+    <joint name="chassis_link_2_rwheel" type="continuous">
+        <origin rpy = "${PI/2} 0 ${PI}" xyz="${-chassis_length/2} ${-1*(chassis_width/2 + wheel_thickness/2)} 0"/>
+        <parent link="chassis_link"/>
+        <child link="rwheel"/>
+        <axis xyz="0 0 1"/>
+        <dynamics damping="0.1" friction="0.1"/>
+        <limits effort="100" velocity="10.0"/>
+    </joint>
+
+    <link name="rwheel">
+        <visual>
+            <geometry>
+                <cylinder length="${wheel_thickness}" radius="${wheel_radius}"/>
+            </geometry>
+            <material name="red"/>
+        </visual>
+        
+        <collision>
+            <geometry>
+                <cylinder length="${wheel_thickness}" radius="${wheel_radius}"/>
+            </geometry>
+        </collision>
+
+        <inertial>
+            <mass value="${right_wheel_mass}"/>
+            <inertia ixx="${1/12*right_wheel_mass*(3*wheel_radius*wheel_radius + wheel_thickness*wheel_thickness)}" ixy="0" 
+                        ixz="0.0" iyy="${1/12*right_wheel_mass*(3*wheel_radius*wheel_radius + wheel_thickness*wheel_thickness)}" iyz="0.0" 
+                        izz="${1/2*right_wheel_mass*wheel_radius*wheel_radius}"/>
+        </inertial>
+
+        <gazebo reference="chassis">
+            <material>Gazebo/Red</material>
+        </gazebo>
+    </link>
+
+
+    <!-- Passive Front Caster Wheel that is frictionless-->
+     <joint name="chassis_2_caster_wheel" type="fixed">
+        <origin rpy="0 0 0" xyz="${chassis_length/2 - caster_wheel_radius} 0 ${-chassis_height/2}"/>
+        <parent link="chassis_link"/>
+        <child link="caster_wheel"/>
+     </joint>
+     <gazebo reference="caster_wheel">
+        <disableFixedJointLumping>true</disableFixedJointLumping>
+     </gazebo>
+
+    <link name="caster_wheel">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="${caster_wheel_radius}"/> 
+            </geometry>
+            <gazebo reference="caster_wheel">
+                <material>Gazebo/White</material>
+            </gazebo>
+            <material name="blue"/>
+        </visual>
+
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="${caster_wheel_radius}"/> 
+            </geometry>
+        </collision>
+
+        <inertial>
+            <mass value="${caster_wheel_mass}"/>
+            <inertia ixx="${2/5*caster_wheel_mass*caster_wheel_radius*caster_wheel_radius}"
+                        ixy="0.0" ixz="0.0" iyy="${2/5*caster_wheel_mass*caster_wheel_radius*caster_wheel_radius}"
+                        iyz="0.0" izz="${2/5*caster_wheel_mass*caster_wheel_radius*caster_wheel_radius}" />
+        </inertial>
+    </link>
+
+    <joint name="imu_joint" type="fixed">
+        <parent link="chassis_link"/>
+        <child link="imu_link"/>
+    </joint>
+    <gazebo reference="imu_link"> <!-- TODO: Remove gazebo reference from main xacro files when transitioning to different simulators-->
+        <disableFixedJointLumping>true</disableFixedJointLumping>
+    </gazebo>
+    <link name="imu_link"/>
+
+    <joint name="lidar_joint" type="fixed">
+        <origin xyz="0 0 ${chassis_height/2 + lidar_height/2}"/>
+        <parent link="chassis_link"/>
+        <child link="lidar_link"/>
+    </joint>
+    <gazebo reference="lidar_link"> <!-- TODO: Remove gazebo reference from main xacro files when transitioning to different simulators-->
+        <disableFixedJointLumping>true</disableFixedJointLumping>
+    </gazebo>
+    <link name="lidar_link">
+        <visual>
+            <geometry>
+                <cylinder length="${lidar_height}" radius="${lidar_radius}"/>
+            </geometry>
+            <material name="purple"/>
+            <gazebo reference="caster_wheel">
+                <material>Gazebo/White</material>
+            </gazebo>
+        </visual>
+        <collision>
+            <geometry>
+                <cylinder length="${lidar_height}" radius="${lidar_radius}"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="${lidar_mass}"/>
+            <inertia ixx="${1/12*lidar_mass*(3*lidar_radius*lidar_radius + lidar_height*lidar_height)}" ixy="0" 
+                        ixz="0.0" iyy="${1/12*lidar_mass*(3*lidar_radius*lidar_radius + lidar_height*lidar_height)}" iyz="0.0" 
+                        izz="${1/2*lidar_mass*lidar_radius*lidar_radius}"/>
+        </inertial>
+    </link>
+
+    <!-- TODO: Do Camera later-->
+    <joint name="camera_joint" type="fixed">
+        <origin xyz="${(chassis_length + camera_depth)/2} 0 0"/>
+        <parent link="chassis_link"/>
+        <child link="camera_link"/>
+    </joint>
+    <gazebo reference="camera_link"> <!-- TODO: Remove gazebo reference from main xacro files when transitioning to different simulators-->
+        <disableFixedJointLumping>true</disableFixedJointLumping>
+    </gazebo>
+    <link name="camera_link">
+        <visual>
+            <geometry> 
+                <box size="${camera_depth} ${camera_width} ${camera_height}"/> 
+            </geometry>
+            <material name="black"/>
+        </visual>
+
+        <collision>
+            <geometry> 
+                <box size="${camera_depth} ${camera_width} ${camera_height}"/>
+            </geometry>
+        </collision>
+
+        <inertial>
+            <mass value="${camera_mass}"/>
+            <inertia ixx="${1/12*camera_mass*(camera_width*camera_width + camera_height*camera_height)}" 
+                        ixy="0.0" ixz="0.0" iyy="${1/12*camera_mass*(camera_depth*camera_depth + camera_height*camera_height)}" 
+                        iyz="0.0" izz="${1/12*camera_mass*(camera_width*camera_width + camera_depth*camera_depth)}"/>
+        </inertial>
+
+        <gazebo reference="chassis">
+            <material>Gazebo/Black</material>
+        </gazebo>
+    </link>
+
+</robot>

@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <!--
+    Specific Documentation:
+    - https://robotics.stackexchange.com/questions/103881/gazebo-plugin-location-and-documentation
+    - https://medium.com/@bytesrobotics/a-review-of-the-ros2-urdf-gazebo-sensor-91e947c633d7
+    -->
+
+    <gazebo>
+        <plugin filename="gz-sim-diff-drive-system" name="gz::sim::systems::DiffDrive">
+            <!-- Wheels -->
+            <right_joint>chassis_link_2_rwheel</right_joint>
+            <left_joint>chassis_link_2_lwheel</left_joint>
+
+            <!-- Kinematics -->
+            <wheel_separation>${chassis_width + 2*wheel_thickness/2}</wheel_separation>
+            <wheel_radius>${wheel_radius}</wheel_radius>
+
+            <!-- Limits -->
+            <max_linear_acceleration>10</max_linear_acceleration>
+
+            <!-- Output -->
+            <odom_publish_frequency>100</odom_publish_frequency>
+            <odom_topic>odom</odom_topic>
+            <frame_id>odom</frame_id>
+            <child_frame_id>base_link</child_frame_id>
+
+            <topic>cmd_vel</topic>
+        </plugin>
+
+        <!-- Publishes joint informaition in gazebo topics-->
+        <!-- TODO: Create joint state topics dependent on robot name s.t. can launch multiple robots -->
+        <plugin filename="gz-sim-joint-state-publisher-system"
+            name="gz::sim::systems::JointStatePublisher">
+            <topic>joint_states</topic>
+            <joint_name>chassis_link_2_rwheel</joint_name>
+            <joint_name>chassis_link_2_lwheel</joint_name>
+        </plugin>
+
+        <!-- Name is the plugin name and filename is the library name -->
+        <plugin filename="gz-sim-odometry-publisher-system"
+            name="gz::sim::systems::OdometryPublisher">
+            <odom_frame>odom</odom_frame>
+            <robot_base_frame>base_link</robot_base_frame>
+            <odom_topic>ground_truth_odom</odom_topic>
+        </plugin>
+    </gazebo>
+
+    <gazebo reference="imu_link">
+        <sensor name="imu" type="imu">
+            <always_on>true</always_on>
+            <update_rate>100</update_rate>
+            <visualize>true</visualize>
+            <topic>imu</topic>
+            <enable_metrics>true</enable_metrics>
+            <!--<gz_frame_id>imu_link</gz_frame_id> --> <!-- Add frame ID for kalman filter later -->
+
+            <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu" />
+        </sensor>
+    </gazebo>
+
+    <gazebo>
+        <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+            <render_engine>ogre2</render_engine>
+        </plugin>
+    </gazebo>
+    <gazebo reference="lidar_link">
+        <!-- Lidar Sensor Definition -->
+        <sensor name="laser" type="gpu_lidar">
+            <pose relative_to='lidar_link'>0 0 0 0 0 0</pose>
+            <topic>scan</topic>
+            <update_rate>10</update_rate>
+            <always_on>1</always_on>
+            <visualize>true</visualize>
+            <gz_frame_id>lidar_link</gz_frame_id> <!-- Need this s.t. header is filled similarly to
+            how ros2 interprets-->
+            <ray>
+                <scan>
+                    <horizontal>
+                        <samples>640</samples>
+                        <resolution>1</resolution>
+                        <min_angle>-3.1415</min_angle>
+                        <max_angle>3.1415</max_angle>
+                    </horizontal>
+
+                    <vertical>
+                        <samples>1</samples>
+                        <resolution>0.01</resolution>
+                        <min_angle>0</min_angle>
+                        <max_angle>0</max_angle>
+                    </vertical>
+                </scan>
+                <range>
+                    <min>0.05</min>
+                    <max>10.0</max>
+                    <resolution>0.01</resolution>
+                </range>
+
+                <noise>
+                    <type>gaussian</type>
+                    <mean>0.0</mean>
+                    <stddev>0.001</stddev>
+                </noise>
+            </ray>
+        </sensor>
+
+    </gazebo>
+
+</robot>

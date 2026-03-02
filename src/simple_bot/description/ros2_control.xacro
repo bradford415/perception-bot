@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <!-- TODO
+    - Gazebo Sim 
+        - ros2_control GazeboSimSystem tag
+        -   Access and control robot interfaces
+        - gazebo gz_ros2_control tag
+            - Loads appropriate HW interface and controller amanger
+    - Try to decide if you should create your own differential drive controller b/c
+        it doesn't seem very useful to create your own if the interface only needed is wheel
+        - Perhaps in future if wheel controls torque?
+    - Finalize TODO:
+        - Look into this later. This is not used atm, but later look into this: for ros2 control w/ gazebo
+        - https://github.com/lucasmazzetto/gazebo_ackermann_steering_vehicle/blob/main/include/vehicle_controller.hpp   
+    -->
+    <ros2_control>
+        <hardware>
+            <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+        </hardware>
+
+        <joint name="chassis_link_2_lwheel">
+            <command_interface name="velocity">
+                <param name="min">-1</param>
+                <param name="max">1</param>
+            </command_interface>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+
+        <joint name="chassis_link_2_rwheel">
+            <command_interface name="velocity">
+                <param name="min">-1</param>
+                <param name="max">1</param>
+            </command_interface>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+    </ros2_control>
+
+    
+    <gazebo>
+        <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+            <parameters>$(find gz_ros2_control_demos)/config/diff_drive_controller.yaml</parameters>
+        </plugin>
+    </gazebo>
+</robot>
