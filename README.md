@@ -24,4 +24,5 @@ Source the setup file
 source install/setup.bash
 ```
 
-
+## TODO:
+1. correct the config file location in setup.py and successfully run the read_lidar script
