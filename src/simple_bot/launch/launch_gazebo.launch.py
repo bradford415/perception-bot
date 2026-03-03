@@ -26,6 +26,7 @@ def generate_launch_description():
     world_args = DeclareLaunchArgument(
         "world_file",
         default_value= 'empty.sdf', #default_world_file,
+        #default_value=default_world_file,
         description="File to launch gazebo world"
     )
 

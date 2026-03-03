@@ -8,6 +8,7 @@ setup(
     name=package_name,
     version='0.0.0',
     packages=find_packages(exclude=['test']),
+    # data_files copies and pastes the listed files in to the share dir 
     # syntax: (destination_folder, [list of files to copy])
     data_files=[
         ('share/ament_index/resource_index/packages',
