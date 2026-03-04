@@ -24,5 +24,28 @@ Source the setup file
 source install/setup.bash
 ```
 
-## TODO:
-1. correct the config file location in setup.py and successfully run the read_lidar script
+## Launching the Bot
+
+Whenever opening a new terminal, be sure to source the setup file as shown above.
+
+### Launch Gazebo with the default world
+```bash
+ros2 launch simple_bot launch_gazebo.launch.py
+```
+
+### Spawn the robot and launch RVIZ
+
+```bash
+ros2 launch simple_bot start.launch.py viz_mode:=true
+```
+
+`viz_mode:=true` tells the launch script to also launch the `visualize_robot.launch.py` launch script, which is responsible for
+1. Reading the robot model (`robot_description`)
+2. Compute link transforms
+3. Publishes the robot TF Tree (transformation tree)
+4. Launches the RViz tool
+
+
+
+### TODO:
+1. 
