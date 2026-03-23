@@ -61,6 +61,14 @@ With RViz open:
 2. Laser Scan should now be added on the left panel and if the check box is chcked, you should see red points where the lidar hits
 3. You can place blocks in gazebo and move the robot around to change where the lidar points hit (you might also notice the lidar hitting the wheels of the robot)
 
+### Loading an RViz config
+You can open a previous RViz state by saving the config as a `.rviz` file and running it with
+```
+rviz2 -d <config>.rviz
+
+# example
+rviz2 -d rviz2 -d src/robot_description/config/view_bot.rviz
+```
 
 
 ### Next Steps:
