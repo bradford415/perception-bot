@@ -63,6 +63,7 @@ With RViz open:
 
 ### Loading an RViz config
 You can open a previous RViz state by saving the config as a `.rviz` file and running it with
+NOTE: This just loads the config in the side panel, you'll still need to run the `robot_state_publisher` and other dependencies
 ```
 rviz2 -d <config>.rviz
 
