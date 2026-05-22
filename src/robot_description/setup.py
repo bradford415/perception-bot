@@ -17,6 +17,9 @@ setup(
 
         # Install URDF/Xacro files
         (os.path.join('share', package_name, 'description'), glob('description/*')),
+        
+        # Install world files
+        (os.path.join('share', package_name, 'worlds'), glob('worlds/*')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,

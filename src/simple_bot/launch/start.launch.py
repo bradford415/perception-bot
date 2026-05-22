@@ -99,8 +99,6 @@ def generate_launch_description():
     )
 
 
-    
-
     # Specify Actions
     spawn_robot_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(launch_dir, "spawn_robot.launch.py")),

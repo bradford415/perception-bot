@@ -12,7 +12,7 @@ import xacro
 
 def generate_launch_description():
     """Every ROS 2 launch file must define this function
-    
+
     Returns:
         a LaunchDescription object which tells ROS "here are the nodes + arguments to launch"
     """
