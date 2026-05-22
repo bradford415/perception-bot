@@ -24,52 +24,77 @@ Source the setup file
 source install/setup.bash
 ```
 
-## Launching the Bot
+## User Guide
+<details>
+  <Summary>Launching the Bot</Summary>
 
-Whenever opening a new terminal, be sure to source the setup file as shown above.
+  ## Launching the Bot
 
-### Launch Gazebo with the default world
-```bash
-ros2 launch simple_bot launch_gazebo.launch.py
-```
+  Whenever opening a new terminal, be sure to source the setup file as shown above.
+  
+  ### Launch Gazebo with the default world and the Robot State Publisher (RSP)
+  Launches gazebo sim, the robot state publisher, and the robot itself; sometimes you'll have to rerun this command twice for it to launch the robot
+  ```bash
+  ros2 launch robot_description launch_sim.launch.py
+  ```
+  
+  ### Reading lidar points with the `read_lidar` Node
+  
+  ```bash
+  ros2 run test_bot_python read_lidar
+  ```
+  
+  ### Spawn the robot and launch RVIZ
+  
+  ```bash
+  ros2 launch simple_bot start.launch.py viz_mode:=true
+  ```
+  
+  `viz_mode:=true` tells the launch script to also launch the `visualize_robot.launch.py` launch script, which is responsible for
+  1. Reading the robot model (`robot_description`)
+  2. Compute link transforms
+  3. Publishes the robot TF Tree (transformation tree)
+  4. Launches the RViz tool
 
-### Reading lidar points with the `read_lidar` Node
+  ### Driving the robot
+  First, create a bridge to translate ROS2 messages into Gazebo Transport
+  ```bash
+  ros2 run ros_gz_bridge parameter_bridge /cmd_vel@geometry_msgs/msg/Twist@gz.msgs.Twist
+  ```
 
-```bash
-ros2 run test_bot_python read_lidar
-```
+  Once the robot is spawned and the bridge is created, we can drive the robot with the teleop keyboard
+  ```bash
+  ros2 run teleop_twist_keyboard teleop_twist_keyboard 
+  ```
 
-### Spawn the robot and launch RVIZ
+</details>
 
-```bash
-ros2 launch simple_bot start.launch.py viz_mode:=true
-```
+<details>
+  <Summary>Using RViz</Summary>
 
-`viz_mode:=true` tells the launch script to also launch the `visualize_robot.launch.py` launch script, which is responsible for
-1. Reading the robot model (`robot_description`)
-2. Compute link transforms
-3. Publishes the robot TF Tree (transformation tree)
-4. Launches the RViz tool
+  ## Using RViz
 
-## Using RViz
+  ### Visualize the lidar points
+  RViz can show the lidar points for the objects the beams hit off (it does not show all the beams since it does not measure empty space).
+  
+  With RViz open:
+  1. In the left panel click Add > By Topic > /scan Laser Scan > OK
+  2. Laser Scan should now be added on the left panel and if the check box is chcked, you should see red points where the lidar hits
+  3. You can place blocks in gazebo and move the robot around to change where the lidar points hit (you might also notice the lidar hitting the wheels of the robot)
+  
+  ### Loading an RViz config
+  You can open a previous RViz state by saving the config as a `.rviz` file and running it with
+  NOTE: This just loads the config in the side panel; you'll still need to run the `robot_state_publisher` and other dependencies
+  ```
+  rviz2 -d <config>.rviz
+  
+  # example
+  rviz2 -d rviz2 -d src/robot_description/config/view_bot.rviz
+  ```
+</details>
 
-### Visualize the lidar points
-RViz can show the lidar points for the objects the beams hit off (it does not show all the beams since it does not measure empty space).
 
-With RViz open:
-1. In the left panel click Add > By Topic > /scan Laser Scan > OK
-2. Laser Scan should now be added on the left panel and if the check box is chcked, you should see red points where the lidar hits
-3. You can place blocks in gazebo and move the robot around to change where the lidar points hit (you might also notice the lidar hitting the wheels of the robot)
-
-### Loading an RViz config
-You can open a previous RViz state by saving the config as a `.rviz` file and running it with
-```
-rviz2 -d <config>.rviz
-
-# example
-rviz2 -d rviz2 -d src/robot_description/config/view_bot.rviz
-```
 
 
 ### Next Steps:
-1. 
+1. Add the bridge to the launch file
