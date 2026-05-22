@@ -55,8 +55,9 @@ source install/setup.bash
   3. Publishes the robot TF Tree (transformation tree)
   4. Launches the RViz tool
 </details>
-<detials>
+<details>
   <Summary>Using RViz</Summary>
+
   ## Using RViz
 
   ### Visualize the lidar points
@@ -76,7 +77,7 @@ source install/setup.bash
   # example
   rviz2 -d rviz2 -d src/robot_description/config/view_bot.rviz
   ```
-</detials>
+</details>
 
 
 
