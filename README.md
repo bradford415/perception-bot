@@ -32,9 +32,10 @@ source install/setup.bash
 
   Whenever opening a new terminal, be sure to source the setup file as shown above.
   
-  ### Launch Gazebo with the default world
+  ### Launch Gazebo with the default world and the Robot State Publisher (RSP)
+  Launches gazebo sim, the robot state publisher, and the robot itself; sometimes you'll have to rerun this command twice for it to launch the robot
   ```bash
-  ros2 launch simple_bot launch_gazebo.launch.py
+  ros2 launch robot_description launch_sim.launch.py
   ```
   
   ### Reading lidar points with the `read_lidar` Node
@@ -54,7 +55,20 @@ source install/setup.bash
   2. Compute link transforms
   3. Publishes the robot TF Tree (transformation tree)
   4. Launches the RViz tool
+
+  ### Driving the robot
+  First, create a bridge to translate ROS2 messages into Gazebo Transport
+  ```bash
+  ros2 run ros_gz_bridge parameter_bridge /cmd_vel@geometry_msgs/msg/Twist@gz.msgs.Twist
+  ```
+
+  Once the robot is spawned and the bridge is created, we can drive the robot with the teleop keyboard
+  ```bash
+  ros2 run teleop_twist_keyboard teleop_twist_keyboard 
+  ```
+
 </details>
+
 <details>
   <Summary>Using RViz</Summary>
 
@@ -70,7 +84,7 @@ source install/setup.bash
   
   ### Loading an RViz config
   You can open a previous RViz state by saving the config as a `.rviz` file and running it with
-  NOTE: This just loads the config in the side panel, you'll still need to run the `robot_state_publisher` and other dependencies
+  NOTE: This just loads the config in the side panel; you'll still need to run the `robot_state_publisher` and other dependencies
   ```
   rviz2 -d <config>.rviz
   
@@ -83,4 +97,4 @@ source install/setup.bash
 
 
 ### Next Steps:
-1. 
+1. Add the bridge to the launch file
