@@ -24,52 +24,61 @@ Source the setup file
 source install/setup.bash
 ```
 
-## Launching the Bot
+## User Guide
+<details>
+  <Summary>Launching the Bot</Summary>
 
-Whenever opening a new terminal, be sure to source the setup file as shown above.
+  ## Launching the Bot
 
-### Launch Gazebo with the default world
-```bash
-ros2 launch simple_bot launch_gazebo.launch.py
-```
+  Whenever opening a new terminal, be sure to source the setup file as shown above.
+  
+  ### Launch Gazebo with the default world
+  ```bash
+  ros2 launch simple_bot launch_gazebo.launch.py
+  ```
+  
+  ### Reading lidar points with the `read_lidar` Node
+  
+  ```bash
+  ros2 run test_bot_python read_lidar
+  ```
+  
+  ### Spawn the robot and launch RVIZ
+  
+  ```bash
+  ros2 launch simple_bot start.launch.py viz_mode:=true
+  ```
+  
+  `viz_mode:=true` tells the launch script to also launch the `visualize_robot.launch.py` launch script, which is responsible for
+  1. Reading the robot model (`robot_description`)
+  2. Compute link transforms
+  3. Publishes the robot TF Tree (transformation tree)
+  4. Launches the RViz tool
+</details>
+<detials>
+  <Summary>Using RViz</Summary>
+  ## Using RViz
 
-### Reading lidar points with the `read_lidar` Node
+  ### Visualize the lidar points
+  RViz can show the lidar points for the objects the beams hit off (it does not show all the beams since it does not measure empty space).
+  
+  With RViz open:
+  1. In the left panel click Add > By Topic > /scan Laser Scan > OK
+  2. Laser Scan should now be added on the left panel and if the check box is chcked, you should see red points where the lidar hits
+  3. You can place blocks in gazebo and move the robot around to change where the lidar points hit (you might also notice the lidar hitting the wheels of the robot)
+  
+  ### Loading an RViz config
+  You can open a previous RViz state by saving the config as a `.rviz` file and running it with
+  NOTE: This just loads the config in the side panel, you'll still need to run the `robot_state_publisher` and other dependencies
+  ```
+  rviz2 -d <config>.rviz
+  
+  # example
+  rviz2 -d rviz2 -d src/robot_description/config/view_bot.rviz
+  ```
+</detials>
 
-```bash
-ros2 run test_bot_python read_lidar
-```
 
-### Spawn the robot and launch RVIZ
-
-```bash
-ros2 launch simple_bot start.launch.py viz_mode:=true
-```
-
-`viz_mode:=true` tells the launch script to also launch the `visualize_robot.launch.py` launch script, which is responsible for
-1. Reading the robot model (`robot_description`)
-2. Compute link transforms
-3. Publishes the robot TF Tree (transformation tree)
-4. Launches the RViz tool
-
-## Using RViz
-
-### Visualize the lidar points
-RViz can show the lidar points for the objects the beams hit off (it does not show all the beams since it does not measure empty space).
-
-With RViz open:
-1. In the left panel click Add > By Topic > /scan Laser Scan > OK
-2. Laser Scan should now be added on the left panel and if the check box is chcked, you should see red points where the lidar hits
-3. You can place blocks in gazebo and move the robot around to change where the lidar points hit (you might also notice the lidar hitting the wheels of the robot)
-
-### Loading an RViz config
-You can open a previous RViz state by saving the config as a `.rviz` file and running it with
-NOTE: This just loads the config in the side panel, you'll still need to run the `robot_state_publisher` and other dependencies
-```
-rviz2 -d <config>.rviz
-
-# example
-rviz2 -d rviz2 -d src/robot_description/config/view_bot.rviz
-```
 
 
 ### Next Steps:
