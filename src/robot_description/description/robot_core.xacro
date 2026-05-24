@@ -124,4 +124,9 @@
         </xacro:inertial_sphere>
     </link>
 
+    <gazebo reference="caster_wheel">
+        <mu1>0.001</mu1> <!-- mus make the caster wheel frictionless -->
+        <mu2>0.001</mu2>
+    </gazebo>
+
 </robot>

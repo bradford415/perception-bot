@@ -1,18 +1,16 @@
 import rclpy
 from rclpy.node import Node
-
-from std_msgs.msg import String
 from sensor_msgs.msg import LaserScan
+from std_msgs.msg import String
+
 
 class MinimalSubscriber(Node):
 
     def __init__(self):
-        super().__init__('minimal_subscriber')
+        super().__init__("minimal_subscriber")
         self.subscription = self.create_subscription(
-            LaserScan,
-            '/scan',
-            self.listener_callback,
-            10)
+            LaserScan, "/scan", self.listener_callback, 10
+        )
         self.subscription  # prevent unused variable warning
 
     def listener_callback(self, msg):
@@ -21,9 +19,9 @@ class MinimalSubscriber(Node):
 
 
 def main(args=None):
-    
+
     ############# start here try to process lidar data ############# do I make a new node for this?
-    
+
     rclpy.init(args=args)
 
     minimal_subscriber = MinimalSubscriber()
@@ -37,5 +35,5 @@ def main(args=None):
     rclpy.shutdown()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
