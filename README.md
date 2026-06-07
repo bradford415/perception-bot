@@ -37,6 +37,18 @@ source install/setup.bash
   ```bash
   ros2 launch robot_description launch_sim.launch.py
   ```
+
+  ### Driving the robot
+  NOTE: now that we bridged the `Twist` message in the laucnh file we no should not need to bridge it through the CLI (skip to the next step)
+  First, create a bridge to translate ROS2 messages into Gazebo Transport
+  ```bash
+  ros2 run ros_gz_bridge parameter_bridge /cmd_vel@geometry_msgs/msg/Twist@gz.msgs.Twist
+  ```
+
+  Once the robot is spawned and the bridge is created, we can drive the robot with the teleop keyboard
+  ```bash
+  ros2 run teleop_twist_keyboard teleop_twist_keyboard 
+  ```
   
   ### Reading lidar points with the `read_lidar` Node
   
@@ -55,17 +67,6 @@ source install/setup.bash
   2. Compute link transforms
   3. Publishes the robot TF Tree (transformation tree)
   4. Launches the RViz tool
-
-  ### Driving the robot
-  First, create a bridge to translate ROS2 messages into Gazebo Transport
-  ```bash
-  ros2 run ros_gz_bridge parameter_bridge /cmd_vel@geometry_msgs/msg/Twist@gz.msgs.Twist
-  ```
-
-  Once the robot is spawned and the bridge is created, we can drive the robot with the teleop keyboard
-  ```bash
-  ros2 run teleop_twist_keyboard teleop_twist_keyboard 
-  ```
 
 </details>
 
