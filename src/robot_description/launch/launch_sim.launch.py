@@ -37,10 +37,17 @@ def generate_launch_description():
         launch_arguments={"use_sim_time": "true"}.items(),
     )
 
+    # resolve the absolute path to the default world file
+    default_world_path = os.path.join(
+        get_package_share_directory(package_name),
+        "worlds",
+        "empty.sdf",
+        )
+
     world = LaunchConfiguration('world')
     world_arg = DeclareLaunchArgument(
         'world',
-        default_value="empty.sdf",
+        default_value=default_world_path,
         description='World to load'
         )
 

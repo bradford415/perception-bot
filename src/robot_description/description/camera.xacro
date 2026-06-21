@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <joint name="camera_joint" type="fixed">
+        <parent link="chassis"/>
+        <child link="camera_link"/>
+        <origin xyz="0.28 0 0.18" rpy="0 0 0"/>
+    </joint>
+
+    <link name="camera_link">
+        <visual>
+        <geometry>
+            <box size="0.03 0.08 0.03"/>
+        </geometry>
+        <material name="black"/>
+        </visual>
+    </link>
+
+    <gazebo reference="camera_link">
+        <sensor type="camera" name="camera">
+            
+            <!-- simplify the camera topic name -->
+            <topic>camera/image</topic>
+
+            <pose>0 0 0 0 0 0</pose>
+            <visualize>true</visualize>
+
+            <!-- 5 hz which is about 5 fps-->
+            <update_rate>5</update_rate>
+            <camera>
+                <!-- field of view in radians-->
+                <horizontal_fov>1.0</horizontal_fov>
+                <image>
+                    <width>640</width>
+                    <height>480</height>
+                    <format>R8G8B8</format>
+                </image>
+                <clip>
+                    <!-- camera will only render objects if they are between [near, far] - units in meters -->
+                    <near>0.05</near>
+                    <far>20</far>
+                </clip>
+            </camera>
+
+        </sensor>
+    </gazebo>
+</robot>

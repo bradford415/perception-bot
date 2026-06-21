@@ -8,6 +8,28 @@
       <real_time_factor>1.0</real_time_factor>
     </physics>
 
+    <!-- Physics plugin - for simulating the physics of the simulation -->
+    <plugin
+      filename="gz-sim-physics-system"
+      name="gz::sim::systems::Physics" />
+
+    <!-- Sensors plugin - for camera and other sensors -->
+    <plugin
+      filename="gz-sim-sensors-system"
+      name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+
+    <!-- User commands plugin - for sending commands to the simulation -->
+    <plugin
+      filename="gz-sim-user-commands-system"
+      name="gz::sim::systems::UserCommands" />
+
+    <!-- Scene broadcaster plugin - for publishing the state of the simulation -->
+    <plugin
+      filename="gz-sim-scene-broadcaster-system"
+      name="gz::sim::systems::SceneBroadcaster" />
+
     <!-- Directional light (sun replacement) -->
     <light name="sun" type="directional">
       <cast_shadows>true</cast_shadows>
