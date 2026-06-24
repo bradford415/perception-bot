@@ -22,7 +22,22 @@ class ObjectDetectionNode : public rclcpp::Node {
     private:
         void imageCallback(const sensor_msgs::msg::Image::SharedPtr msg) {
             // Process the received image
+                RCLCPP_INFO(
+            this->get_logger(),
+            "Received image: %u x %u, encoding=%s, data=%zu bytes",
+            msg->width,
+            msg->height,
+            msg->encoding.c_str(),
+            msg->data.size());
         }
-
+ 
         rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr image_sub_;
 };
+
+
+int main(int argc, char * argv[]) {
+    rclcpp::init(argc, argv);
+    rclcpp::spin(std::make_shared<ObjectDetectionNode>());
+    rclcpp::shutdown();
+    return 0;
+}

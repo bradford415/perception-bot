@@ -26,4 +26,25 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
+
+add_executable(object_detection_node src/object_detection_node.cpp)
+
+ament_target_dependencies(object_detection_node
+  rclcpp
+  sensor_msgs
+  cv_bridge
+  image_transport
+)
+
+# link the libraries the executable depends on - needs to be done for every executable
+target_link_libraries(object_detection_node
+  ${OpenCV_LIBRARIES}
+)
+
+install(TARGETS
+  object_detection_node
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+
 ament_package()
