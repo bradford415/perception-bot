@@ -88,6 +88,13 @@ def generate_launch_description():
         ],
         output="screen",
     )
+    
+    obj_det_config = os.path.join(get_package_share_directory("robot_perception"), "config", "object_detection.yaml")
+    object_detection = Node(
+        package="robot_perception",
+        executable="object_detection_node",
+        parameters=[obj_det_config],
+    )
 
     # Launch them all!
     return LaunchDescription(
@@ -100,5 +107,6 @@ def generate_launch_description():
             #TimerAction(period=3.0, actions=[spawn_entity]),
             spawn_entity,
             ros_gz_bridge,
+            object_detection,
         ]
     )
