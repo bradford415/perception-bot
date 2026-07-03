@@ -26,8 +26,15 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
+# set the root dir where we install the onnx headers and libraries
+set(ONNXRUNTIME_DIR "/usr/local")
 
-add_executable(object_detection_node src/object_detection_node.cpp)
+# add the source files to be compiled into the executable
+add_executable(object_detection_node 
+  src/object_detection_node.cpp
+  src/onnx_inference.cpp
+  src/rtdetr_postprocessor.cpp
+)
 
 ament_target_dependencies(object_detection_node
   rclcpp
@@ -39,6 +46,13 @@ ament_target_dependencies(object_detection_node
 # link the libraries the executable depends on - needs to be done for every executable
 target_link_libraries(object_detection_node
   ${OpenCV_LIBRARIES}
+  ${ONNXRUNTIME_DIR}/lib/libonnxruntime.so
+)
+
+target_include_directories(object_detection_node
+  PUBLIC
+    include # relative path to include dir
+    ${ONNXRUNTIME_DIR}/include
 )
 
 install(TARGETS
