@@ -25,6 +25,8 @@ std::vector<Detection> RTDETRPostprocessor::process_outputs(
     int orig_image_width, 
     int orig_image_height) {
 
+    std::cout << "post processing the detections" << std::endl;
+
     const auto& logits = onnx_outputs.pred_logits;
     const auto& boxes = onnx_outputs.pred_boxes;
     const auto& logits_shape = onnx_outputs.logits_shape;
@@ -73,9 +75,54 @@ std::vector<Detection> RTDETRPostprocessor::process_outputs(
         }
     );
 
-    // for (auto& val : scored) {
-    //     std::cout << val << std::endl;
-    // }
+    // Decode the topk indices to which queries they belong to; since we flattened all the queries,
+    // they're each groups of size `num_classes`
+    std::vector<int> topk_box_query;
+    std::vector<int> topk_label_id;
+    topk_box_query.reserve(this->num_selected_queries);
+    topk_label_id.reserve(this->num_selected_queries);
+    for (int k = 0; k < this->num_selected_queries; ++k){
+        topk_box_query.push_back(scored[k].index / num_classes); // find which query the box belongs to
+        topk_label_id.push_back(scored[k].index % num_classes); // find which class the box belongs to
+    }
+
+    assert(topk_box_query.size() == topk_label_id.size());
+
+    // TODO: I'll need to map the ids to the class name somewhere along the way
+
+    std::vector<Detection> detections;
+    detections.reserve(this->num_selected_queries);
+    for (int k = 0; k < this->num_selected_queries; ++k){
+        int query_ind = topk_box_query[k]
+
+        // find the query box offset, extract the 4 box parameters (cx, cy, w, h), and scale the
+        // normalized coordinates back to the original image size
+        float cx = boxes[query_ind * 4] * orig_image_width
+        float cy = boxes[query_ind * 4 + 1] * orig_image_height
+        float w = boxes[query_ind * 4 + 2] * orig_image_width
+        float h = boxes[query_ind * 4 + 3] * orig_image_height
+
+        float top_left_x = cx - (w / 2)
+        float top_left_y = cy - (h / 2)
+
+        // init cv box and convert cxcy to tl_x tl_y as expected by cv::Rect2f
+        cv::Rect2f cv_box{
+            cx - w / 2.0f,
+            cy - h / 2.0f,
+            w,
+            h,
+        } // NOTE: 2f -> 2d rectangle using float values
+
+        // create the Detection struct
+        Detction detection{
+            topk_label_id[k],
+            scored[k].score,
+            cv_box
+        }
+        detections.push_back(detection)
+    }
+
+    // start here!!! compile and continue with postprocessor
 
     
 }

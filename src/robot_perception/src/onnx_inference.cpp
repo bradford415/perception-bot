@@ -84,7 +84,6 @@ ONNXOutputs ONNXInference::inference_image(const std::vector<float>& input_data)
     for (auto dim : boxes_shape) {
         boxes_count *= static_cast<std::size_t>(dim);
     }
-
     std::vector<float> logits_vec(pred_logits, pred_logits + logits_count);
     std::vector<float> boxes_vec(pred_boxes, pred_boxes + boxes_count);
 
