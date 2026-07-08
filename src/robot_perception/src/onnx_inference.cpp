@@ -87,7 +87,7 @@ ONNXOutputs ONNXInference::inference_image(const std::vector<float>& input_data)
     std::vector<float> logits_vec(pred_logits, pred_logits + logits_count);
     std::vector<float> boxes_vec(pred_boxes, pred_boxes + boxes_count);
 
-    // wrap the onnx outputs to return them to the object_detection node
+    // wrap the raw onnx outputs to return them to the object_detection node
     ONNXOutputs onnx_outputs{
         logits_vec,
         boxes_vec,
