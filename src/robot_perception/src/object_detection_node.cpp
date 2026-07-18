@@ -14,7 +14,6 @@
 // TODO: find a better place for this
 // rt-detr class map
 std::vector<std::string> class_names_{
- //'__background__',
 "person",
 "bicycle",
 "car",
@@ -73,16 +72,16 @@ std::vector<std::string> class_names_{
 "cake",
 "chair",
 "couch",
-"potted pla",
+"potted plant",
 "bed",
-"dining tab",
+"dining table",
 "toilet",
 "tv",
 "laptop",
 "mouse",
 "remote",
 "keyboard",
-"cell pho",
+"cell phone",
 "microwave",
 "oven",
 "toaster",
@@ -104,11 +103,17 @@ class ObjectDetectionNode : public rclcpp::Node {
         {
             image_subscriber_ = create_subscription<sensor_msgs::msg::Image>(
                 "/camera/image", // the ROS2 topic name to subscribe to
-                10, // Queue size - keeps the 10 most recent images (queue will back up image imageCallback is slow)
+                1, // Queue size - keeps the 10 most recent images (queue will back up image imageCallback is slow)
+                   // NOTE: changeing from 10 to 1 so detection node does not have to process all frames
 
                 // Callback function to be called when a new image is received
                 std::bind(&ObjectDetectionNode::imageCallback, this, std::placeholders::_1)
             );
+
+            // mostly for visualization and debugging purposes
+            annotated_image_publisher_ = create_publisher<sensor_msgs::msg::Image>(
+                "/annotated_image", 
+                rclcpp::SensorDataQoS().keep_last(1));
 
             // initialize the inferencer as a pointer because we don't know the model_path
             // until after the node is initialized; model_path comes from the config yaml file
@@ -117,7 +122,6 @@ class ObjectDetectionNode : public rclcpp::Node {
 
             confidence_threhsold_ = this->declare_parameter<double>("confidence_threhsold", 0.5);
             RCLCPP_INFO(this->get_logger(), "\nUsing a confidence threshold of %f", confidence_threhsold_);
-
 
             inferencer_ = std::make_unique<ONNXInference>(model_path_);
             std::cout << "\nConstructed ONNXInference instance" << std::endl;
@@ -192,11 +196,75 @@ class ObjectDetectionNode : public rclcpp::Node {
                 );
             }
 
+            // TODO: probably should make this its own method
+            // create an annotated image w/ the predicted bounding boxes and class labels for visualization
+            RCLCPP_INFO(this->get_logger(), "Annotating the image with the detections");
+            cv::Mat annotated_image = image.clone();
+            for (const auto& detection: detections) {
+        
+                // convert boxes float->ints and clip the box to the image dimensions
+                cv::Rect box = detection.box;
+                box &= cv::Rect(0, 0, annotated_image.cols, annotated_image.rows);
 
+                if (box.empty()) {
+                    continue;
+                }
+
+                // opencv rectangle docs:
+                //  https://www.opencv.org.cn/opencvdoc/2.3.2/html/modules/core/doc/drawing_functions.html?highlight=ellipse#void%20rectangle(Mat&%20img,%20Rect%20r,%20const%20Scalar&%20color,%20int%20thickness,%20int%20lineType,%20int%20shift)
+                cv::rectangle(
+                    annotated_image, // img to draw on
+                    box, // the box to draw; 
+                    cv::Scalar(0, 255, 0), // box color
+                    2 // thickness of the rectangle in pixels
+                );
+
+                // create a string of the class pred + conf
+                const std::string label = 
+                    class_names_[detection.class_id] + " " + 
+                    cv::format("%.2f", detection.confidence);
+
+                // baseline is the additional space needed below the spaceline;
+                // baseline is the line most letters sit on (e.g., g, p & y could go below the baseline)
+                int baseline = 0; 
+                const cv::Size text_size = cv::getTextSize(
+                    label,
+                    cv::FONT_HERSHEY_SIMPLEX,
+                    0.5,
+                    1,
+                    &baseline);                
+
+                // bottom left point of the baseline to start the text
+                const cv::Point text_origin(
+                    box.x,
+                    std::max(box.y - 5, text_size.height));
+
+                // draw the text on the image
+                cv::putText(
+                    annotated_image,
+                    label,
+                    text_origin,
+                    cv::FONT_HERSHEY_SIMPLEX,
+                    0.5,
+                    cv::Scalar(0, 255, 0),
+                    1,
+                    cv::LINE_AA);
+            }
             //RCLCPP_INFO(this->get_logger(), "\nDetected %zu objects", detections.size());
+
+            auto output_msg = cv_bridge::CvImage(
+                msg->header, // copies original timestamp & frame id to keep the annotated img synchronized w/ the camera img
+                sensor_msgs::image_encodings::BGR8, 
+                annotated_image)
+                .toImageMsg();
+
+            // publish the annotated image
+            RCLCPP_INFO(this->get_logger(), "Publishing the annotated image");
+            annotated_image_publisher_->publish(*output_msg);
         }
  
         rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr image_subscriber_;
+        rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr annotated_image_publisher_;
         std::unique_ptr<ONNXInference> inferencer_;
         std::string model_path_;
         double confidence_threhsold_;

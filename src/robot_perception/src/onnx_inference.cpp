@@ -11,8 +11,14 @@ ONNXInference::ONNXInference(const std::string& model_path)
         env_(ORT_LOGGING_LEVEL_WARNING, "onnx_inference"),
         session_options_(),
         session_(nullptr) {
+
+        // setup cuda params
+        OrtCUDAProviderOptions cuda_options{};
+        cuda_options.device_id = 0; // which gpu device to use
+        session_options_.AppendExecutionProvider_CUDA(cuda_options);
+
         session_options_.SetIntraOpNumThreads(1);
-        session_options_.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_EXTENDED); // enables basic and extended graph optimizations: https://onnxruntime.ai/docs/performance/model-optimizations/graph-optimizations.html#extended-graph-optimizations 
+        session_options_.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_ALL); // which graph optmizations to enable: https://onnxruntime.ai/docs/performance/model-optimizations/graph-optimizations.html#extended-graph-optimizations 
         session_ = Ort::Session(env_, model_path_.c_str(), session_options_);
 
         // Allocator used for querying the model input/output info; outputs logits and bboxes so we'll need two outputs

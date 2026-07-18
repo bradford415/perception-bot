@@ -1,0 +1,125 @@
+<sdf version='1.10'>
+  <world name='default'>
+    <physics name='1ms' type='ignored'>
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+    <plugin name='gz::sim::systems::Physics' filename='gz-sim-physics-system'/>
+    <plugin name='gz::sim::systems::Sensors' filename='gz-sim-sensors-system'>
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <plugin name='gz::sim::systems::UserCommands' filename='gz-sim-user-commands-system'/>
+    <plugin name='gz::sim::systems::SceneBroadcaster' filename='gz-sim-scene-broadcaster-system'/>
+    <gravity>0 0 -9.8000000000000007</gravity>
+    <magnetic_field>5.5644999999999998e-06 2.2875799999999999e-05 -4.2388400000000002e-05</magnetic_field>
+    <atmosphere type='adiabatic'/>
+    <scene>
+      <ambient>0.400000006 0.400000006 0.400000006 1</ambient>
+      <background>0.699999988 0.699999988 0.699999988 1</background>
+      <shadows>true</shadows>
+    </scene>
+    <model name='ground_plane'>
+      <static>true</static>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <surface>
+            <friction>
+              <ode/>
+            </friction>
+            <bounce/>
+            <contact/>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0.800000012 0.800000012 0.800000012 1</ambient>
+            <diffuse>0.800000012 0.800000012 0.800000012 1</diffuse>
+          </material>
+        </visual>
+        <pose>0 0 0 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <enable_wind>false</enable_wind>
+      </link>
+      <pose>0 0 0 0 0 0</pose>
+      <self_collide>false</self_collide>
+    </model>
+    <include>
+      <uri>file:///home/bselee/.gz/fuel/fuel.gazebosim.org/openrobotics/models/standing person/3</uri>
+      <name>person_standing</name>
+      <pose>4.7972698211669922 0.60343897342681885 -6.3030718089329692e-11 1.6745618956081936e-21 6.8893812650401693e-22 -1.6064645096277819</pose>
+    </include>
+    <include>
+      <uri>file:///home/bselee/.gz/fuel/fuel.gazebosim.org/openrobotics/models/standing person/3</uri>
+      <name>person_standing_1</name>
+      <pose>5.0237337072012771 -1.2295620231635578 -9.407424213757342e-11 3.8533726506289184e-21 1.8461860059664236e-21 -1.6064599650500981</pose>
+    </include>
+    <include>
+      <uri>file:///home/bselee/.gz/fuel/fuel.gazebosim.org/openrobotics/models/standing person/3</uri>
+      <name>person_standing_2</name>
+      <pose>4.8598852240809869 -2.6828596067340631 -9.407424213757342e-11 1.251287436663708e-21 1.5923126161687353e-21 -1.6064599650500981</pose>
+    </include>
+    <include>
+      <uri>file:///home/bselee/.gz/fuel/fuel.gazebosim.org/openrobotics/models/outsidebench/3</uri>
+      <name>OutsideBench</name>
+      <pose>3.4853100776672572 -0.18101699650290715 -2.5684688311762402e-07 3.5870922882503774e-07 -8.5526281531667459e-07 -3.1139429871752951</pose>
+    </include>
+    <include>
+      <uri>file:///home/bselee/.gz/fuel/fuel.gazebosim.org/openrobotics/models/stop sign/3</uri>
+      <name>Stop Sign</name>
+      <pose>1.3419784657436775 -5.1934393127347871 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/bselee/.gz/fuel/fuel.gazebosim.org/openrobotics/models/stop sign/3</uri>
+      <name>Stop Sign_0</name>
+      <pose>0.080841418403061027 -5.0280146645591461 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/bselee/.gz/fuel/fuel.gazebosim.org/googleresearch/models/sootheze_cold_therapy_elephant/1</uri>
+      <name>Sootheze_Cold_Therapy_Elephant</name>
+      <pose>0.41321516291370747 2.4590296301619983 -0.00011618038300941798 0.0013484768259936068 0.0025610243552557383 1.5760325322392483</pose>
+    </include>
+    <light name='sun' type='directional'>
+      <pose>0 0 10 0 0 0</pose>
+      <cast_shadows>true</cast_shadows>
+      <intensity>1</intensity>
+      <direction>-0.5 0.10000000000000001 -0.90000000000000002</direction>
+      <diffuse>0.800000012 0.800000012 0.800000012 1</diffuse>
+      <specular>0.200000003 0.200000003 0.200000003 1</specular>
+      <attenuation>
+        <range>10</range>
+        <linear>1</linear>
+        <constant>1</constant>
+        <quadratic>0</quadratic>
+      </attenuation>
+      <spot>
+        <inner_angle>0</inner_angle>
+        <outer_angle>0</outer_angle>
+        <falloff>0</falloff>
+      </spot>
+    </light>
+  </world>
+</sdf>
