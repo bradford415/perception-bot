@@ -20,10 +20,20 @@ static float sigmoid(float x) {
 }
 
 // NOTE: do not need to write the constructor in this file because it's set as deafult
+/**
+ * Postprocces the raw object detection outputs from ONNX.
+ * 
+ * Postprocessing steps:
+ *  1. Apply sigmoid to all logits across all queries and flatten them into a single vector
+ *  2. Sort the probabilites in decreasing confidence
+ *  3. Decode the querie and label each topk logit belongs to
+ *  4. Extract the box predictions and scale back to the original image size
+*/
 std::vector<Detection> RTDETRPostprocessor::process_outputs(
     ONNXOutputs onnx_outputs,
     int orig_image_width, 
-    int orig_image_height) {
+    int orig_image_height,
+    double confidence_threshold) {
 
     std::cout << "post processing the detections" << std::endl;
 
@@ -51,7 +61,7 @@ std::vector<Detection> RTDETRPostprocessor::process_outputs(
             const int flat_index = q * num_classes + c;
 
             // bc we defined scored to be a ScoreIndex type,brace initialization will automatically 
-            // create a temporary object annd know we're initializing a ScoreIndex
+            // create a temporary object and know we're initializing a ScoreIndex
             scored.push_back({
                 sigmoid(logits[flat_index]), 
                 flat_index
@@ -93,6 +103,12 @@ std::vector<Detection> RTDETRPostprocessor::process_outputs(
     std::vector<Detection> detections;
     detections.reserve(this->num_selected_queries);
     for (int k = 0; k < this->num_selected_queries; ++k){
+
+        // skip the logits which are below the confidence threhsold
+        if (scored[k].score < confidence_threshold){
+            continue;
+        }
+
         int query_ind = topk_box_query[k];
 
         // find the query box offset, extract the 4 box parameters (cx, cy, w, h), and scale the
@@ -121,4 +137,3 @@ std::vector<Detection> RTDETRPostprocessor::process_outputs(
 
     return detections;
 }
-

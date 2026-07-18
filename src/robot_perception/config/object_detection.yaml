@@ -1,3 +1,4 @@
 object_detection_node:
   ros__parameters:
     model_path: "/mnt/d/model-registry/object-detection/rt-detrv2/rn50-rtdetrv2/rtdetrv2.onnx"
+    confidence_threshold: 0.5

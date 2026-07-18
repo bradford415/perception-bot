@@ -11,6 +11,92 @@
 #include "robot_perception/rtdetr_postprocessor.hpp"
 
 
+// TODO: find a better place for this
+// rt-detr class map
+std::vector<std::string> class_names_{
+ //'__background__',
+"person",
+"bicycle",
+"car",
+"motorcycle",
+"airplane",
+"bus",
+"train",
+"truck",
+"boat",
+"traffic light",
+"fire hydrant",
+"stop sign",
+"parking meter",
+"bench",
+"bird",
+"cat",
+"dog",
+"horse",
+"sheep",
+"cow",
+"elephant",
+"bear",
+"zebra",
+"giraffe",
+"backpack",
+"umbrella",
+"handbag",
+"tie",
+"suitcase",
+"frisbee",
+"skis",
+"snowboard",
+"sports bat",
+"kite",
+"baseball bat",
+"baseball glove",
+"skateboard",
+"surfboard",
+"tennis rack",
+"bottle",
+"wine glass",
+"cup",
+"fork",
+"knife",
+"spoon",
+"bowl",
+"banana",
+"apple",
+"sandwich",
+"orange",
+"broccoli",
+"carrot",
+"hot dog",
+"pizza",
+"donut",
+"cake",
+"chair",
+"couch",
+"potted pla",
+"bed",
+"dining tab",
+"toilet",
+"tv",
+"laptop",
+"mouse",
+"remote",
+"keyboard",
+"cell pho",
+"microwave",
+"oven",
+"toaster",
+"sink",
+"refrigerator",
+"book",
+"clock",
+"vase",
+"scissors",
+"teddy bear",
+"hair drier",
+"toothbrush",
+};
+
 class ObjectDetectionNode : public rclcpp::Node {
     public:
         ObjectDetectionNode()
@@ -27,7 +113,11 @@ class ObjectDetectionNode : public rclcpp::Node {
             // initialize the inferencer as a pointer because we don't know the model_path
             // until after the node is initialized; model_path comes from the config yaml file
             model_path_ = this->declare_parameter<std::string>("model_path", "");
-            std::cout << "\nLoading ONNX model from the path: " << model_path_ << std::endl;
+            RCLCPP_INFO(this->get_logger(), "\nLoading ONNX model from the path: %s", model_path_.c_str());
+
+            confidence_threhsold_ = this->declare_parameter<double>("confidence_threhsold", 0.5);
+            RCLCPP_INFO(this->get_logger(), "\nUsing a confidence threshold of %f", confidence_threhsold_);
+
 
             inferencer_ = std::make_unique<ONNXInference>(model_path_);
             std::cout << "\nConstructed ONNXInference instance" << std::endl;
@@ -43,7 +133,7 @@ class ObjectDetectionNode : public rclcpp::Node {
             const cv::Mat& image = cv_ptr->image;
 
             RCLCPP_INFO(
-            this->get_logger(),
+            this->get_logger(), 
                 "Original image dimensions: %d x %d (h, w) channels=%d",
                 image.rows,
                 image.cols,
@@ -83,9 +173,25 @@ class ObjectDetectionNode : public rclcpp::Node {
             // inference the image
             RCLCPP_INFO(this->get_logger(), "\nRunning inference on the preprocessed image");
             ONNXOutputs onnx_outputs = inferencer_->inference_image(input_data);
+            RCLCPP_INFO(this->get_logger(), "\nFinished inferencing");
 
             // postprocess the predictions
-            postprocessor_.process_outputs(onnx_outputs, image.cols, image.rows);
+            std::vector<Detection> detections;
+            detections = postprocessor_.process_outputs(onnx_outputs, image.cols, image.rows, confidence_threhsold_);
+            RCLCPP_INFO(this->get_logger(), "\n\nFinished postprocessing the images with %zu detections:", detections.size());
+            for (const auto& detection : detections) {
+                RCLCPP_INFO(
+                    this->get_logger(),
+                    "Class: %s, Confidence: %.2f, Box (XYWH): [%.2f, %.2f, %.2f, %.2f]",
+                    class_names_[detection.class_id].c_str(),
+                    detection.confidence,
+                    detection.box.x,
+                    detection.box.y,
+                    detection.box.width,
+                    detection.box.height
+                );
+            }
+
 
             //RCLCPP_INFO(this->get_logger(), "\nDetected %zu objects", detections.size());
         }
@@ -93,6 +199,7 @@ class ObjectDetectionNode : public rclcpp::Node {
         rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr image_subscriber_;
         std::unique_ptr<ONNXInference> inferencer_;
         std::string model_path_;
+        double confidence_threhsold_;
         RTDETRPostprocessor postprocessor_;
 };
 

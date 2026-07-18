@@ -8,7 +8,6 @@ from launch_ros.actions import Node
 from launch.substitutions import LaunchConfiguration
 
 
-
 def generate_launch_description():
     """This file essentially runs the 3 commands from the command line
     that you would have to run to run the rsp, gz sim, and spawn the robot
@@ -88,7 +87,7 @@ def generate_launch_description():
         ],
         output="screen",
     )
-    
+
     obj_det_config = os.path.join(get_package_share_directory("robot_perception"), "config", "object_detection.yaml")
     object_detection = Node(
         package="robot_perception",
@@ -96,7 +95,7 @@ def generate_launch_description():
         parameters=[obj_det_config],
     )
 
-    # Launch them all!
+    # Launch all nodes
     return LaunchDescription(
         [
             rsp,
