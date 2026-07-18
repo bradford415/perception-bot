@@ -1,5 +1,5 @@
-# First Bot Workspace
-Creating my first bot after learning the basics with Andrew; using a new repo to keep things cleaner
+# Perception Bot Workspace
+Creating a robot to learn more about the broader perception/CV field and gain experience with ROS 2 and simulators.
 
 ## Setup
 For simplicity, some commands are in the `Makefile`
