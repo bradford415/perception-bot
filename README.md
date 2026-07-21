@@ -98,4 +98,4 @@ source install/setup.bash
 
 
 ### Next Steps:
-1. Add the bridge to the launch file
+1. Start drafting out a plan for real-world implementation (Jetson Nanon, TensorRT, type of camera)
