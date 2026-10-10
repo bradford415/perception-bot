@@ -33,13 +33,16 @@ source install/setup.bash
   Whenever opening a new terminal, be sure to source the setup file as shown above.
   
   ### Launch Gazebo with the default world and the Robot State Publisher (RSP)
-  Launches gazebo sim, the robot state publisher, and the robot itself; sometimes you'll have to rerun this command twice for it to launch the robot
+  Launches gazebo sim, the robot state publisher, and the robot itself; sometimes you'll have to rerun this command twice for it to launch the robot.
+
+  *The current launch script automatically runs the object detection node*
+  
   ```bash
   ros2 launch robot_description launch_sim.launch.py
   ```
 
   ### Driving the robot
-  NOTE: now that we bridged the `Twist` message in the laucnh file we no should not need to bridge it through the CLI (skip to the next step)
+  NOTE: now that we bridged the `Twist` message in the launch file we no should not need to bridge it through the CLI (skip to the next step)
   First, create a bridge to translate ROS2 messages into Gazebo Transport
   ```bash
   ros2 run ros_gz_bridge parameter_bridge /cmd_vel@geometry_msgs/msg/Twist@gz.msgs.Twist
@@ -55,18 +58,6 @@ source install/setup.bash
   ```bash
   ros2 run test_bot_python read_lidar
   ```
-  
-  ### Spawn the robot and launch RVIZ
-  
-  ```bash
-  ros2 launch simple_bot start.launch.py viz_mode:=true
-  ```
-  
-  `viz_mode:=true` tells the launch script to also launch the `visualize_robot.launch.py` launch script, which is responsible for
-  1. Reading the robot model (`robot_description`)
-  2. Compute link transforms
-  3. Publishes the robot TF Tree (transformation tree)
-  4. Launches the RViz tool
 
 </details>
 
